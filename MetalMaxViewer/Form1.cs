@@ -245,5 +245,10 @@ namespace MetalMaxViewer
         {
             richTextBox2.Paste();
         }
+
+        private void GuardarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
