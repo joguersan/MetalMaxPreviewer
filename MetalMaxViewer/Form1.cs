@@ -248,7 +248,32 @@ namespace MetalMaxViewer
 
         private void GuardarToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Po poExport = new Po
+            {
+                Header = new PoHeader("MetalMax", "TraduSquare", "en")
+                {
+                    LanguageTeam = "TraduSquare",
+                }
+            };
 
+            for (int i = 0; i < variables.textoTraducido.Length; i++)
+            {
+                string sentenceOG = variables.textoOriginal[i];
+                string sentenceTranslated = variables.textoTraducido[i];
+                if (string.IsNullOrEmpty(sentenceOG))
+                    sentenceOG = "<!empty>";
+                if (string.IsNullOrEmpty(sentenceTranslated))
+                    sentenceTranslated = "<!empty>";
+
+                poExport.Add(new PoEntry() { 
+                    Context = i.ToString(),
+                    Original = sentenceOG,
+                    Translated = sentenceTranslated
+                });
+
+            }
+
+            poExport.ConvertTo<BinaryFormat>().Stream.WriteTo("export.po");
         }
     }
 }
