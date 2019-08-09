@@ -260,7 +260,7 @@ namespace MetalMaxViewer
                     LanguageTeam = "TraduSquare",
                 }
             };
-            poExport.Header.Extensions.Add("X-1", "Type1");
+            poExport.Header.Extensions.Add("1", "Type1");
 
             for (int i = 0; i < variables.textoTraducido.Length; i++)
             {
