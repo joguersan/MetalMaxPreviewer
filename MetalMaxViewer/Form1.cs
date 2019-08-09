@@ -58,15 +58,20 @@ namespace MetalMaxViewer
             DataStream inputPO = new DataStream(poFileName, FileOpenMode.Read);
             BinaryFormat binaryFile = new BinaryFormat(inputPO);
             Po newPO = binaryFile.ConvertTo<Po>();
+            variables.textoOriginal = new string[newPO.Entries.Count];
+            variables.textoTraducido = new string[newPO.Entries.Count];
+            variables.contexto = new string[newPO.Entries.Count];
             inputPO.Dispose();
             int contador = 0;
             listBox1.Items.Clear();
             Array.Clear(variables.textoOriginal, 0, variables.textoOriginal.Length);
             Array.Clear(variables.textoTraducido, 0, variables.textoTraducido.Length);
+            Array.Clear(variables.contexto, 0, variables.contexto.Length);
             foreach (var entry in newPO.Entries)
             {
                 listBox1.Items.Add(entry.Context);
                 variables.textoOriginal[contador] = entry.Original;
+                variables.contexto[contador] = entry.Context;
 
                 if (entry.Translated == "")
                 {
@@ -79,11 +84,11 @@ namespace MetalMaxViewer
         }
         public static class variables
         {
-            public static string[] textoOriginal = new string[5000];
-            public static string[] textoTraducido = new string[5000];
+            public static string[] textoOriginal;
+            public static string[] textoTraducido;
             public static string[] splittedOr = new string[150];
             public static string[] splittedMod = new string[150];
-            public static string[] contexto = new string[5000];
+            public static string[] contexto;
             public static string textoAuxiliar = "";
             public static int posAuxiliar = -1;
             public static int indice = -1;
@@ -255,18 +260,20 @@ namespace MetalMaxViewer
                     LanguageTeam = "TraduSquare",
                 }
             };
+            poExport.Header.Extensions.Add("X-1", "Type1");
 
             for (int i = 0; i < variables.textoTraducido.Length; i++)
             {
                 string sentenceOG = variables.textoOriginal[i];
                 string sentenceTranslated = variables.textoTraducido[i];
+                string contexto = variables.contexto[i];
                 if (string.IsNullOrEmpty(sentenceOG))
                     sentenceOG = "<!empty>";
                 if (string.IsNullOrEmpty(sentenceTranslated))
                     sentenceTranslated = "<!empty>";
 
                 poExport.Add(new PoEntry() { 
-                    Context = i.ToString(),
+                    Context = contexto,
                     Original = sentenceOG,
                     Translated = sentenceTranslated
                 });
