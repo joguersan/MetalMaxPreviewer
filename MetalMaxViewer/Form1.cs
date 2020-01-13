@@ -107,24 +107,24 @@ namespace MetalMaxViewer
         {
             if (contenido.Contains(".MSG."))
             {
-                pictureBox1.BackgroundImage = MetalMaxViewer.Properties.Resources.bocadillo2;
+                pictureBox1.BackgroundImage = Properties.Resources.bocadillo2;
                 pictureBox1.BackgroundImageLayout=ImageLayout.Stretch;
-                pictureBox2.BackgroundImage = MetalMaxViewer.Properties.Resources.bocadillo2;
+                pictureBox2.BackgroundImage = Properties.Resources.bocadillo2;
                 pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
             }
             else if (contenido.Contains(".SET."))
             {
-                pictureBox1.BackgroundImage = MetalMaxViewer.Properties.Resources.objetos;
+                pictureBox1.BackgroundImage = Properties.Resources.objetos;
                 pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
-                pictureBox2.BackgroundImage = MetalMaxViewer.Properties.Resources.objetos;
+                pictureBox2.BackgroundImage = Properties.Resources.objetos;
                 pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
             }
         }
         
         public void colocarText(string texto1, string texto2, int x, int y)
         {
-            int posJap = Int32.Parse(label1.Text);
-            int posEn = Int32.Parse(label3.Text);
+            int posJap = int.Parse(label1.Text);
+            int posEn = int.Parse(label3.Text);
             posJap--;
             posEn--;
             splitText(texto1, texto2);
@@ -180,8 +180,8 @@ namespace MetalMaxViewer
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            int et1 = Int32.Parse(label1.Text);
-            int et3 = Int32.Parse(label3.Text);
+            int et1 = int.Parse(label1.Text);
+            int et3 = int.Parse(label3.Text);
             variables.textoTraducido[listBox1.SelectedIndex] = richTextBox2.Text;
             if (et1 > 1 && !(et1 < et3))
                 et1--;
