@@ -49,7 +49,11 @@ namespace MetalMaxViewer
                 return false;
             }
 
-            variables.font = new NftrFont(fontPath);
+            NftrFont.CustomPalette = new Colour[2] { Colour.FromColor(Color.White), new Colour(254, 254, 254) };
+            variables.FontWhite = new NftrFont(fontPath);
+
+            NftrFont.CustomPalette = new Colour[2] { Colour.FromColor(Color.White), new Colour(0, 0, 0) };
+            variables.FontBlack = new NftrFont(fontPath);
 
             return true;
         }
@@ -101,7 +105,10 @@ namespace MetalMaxViewer
             public static string textoAuxiliar = "";
             public static int posAuxiliar = -1;
             public static int indice = -1;
-            public static NftrFont font;
+
+            public static NftrFont FontWhite { get; set; }
+
+            public static NftrFont FontBlack { get; set; }
         }
         public void cambioImagen(string contenido)
         {
@@ -130,11 +137,15 @@ namespace MetalMaxViewer
             splitText(texto1, texto2);
             var image = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
             var graphics = Graphics.FromImage(image);
-            variables.font.Painter.DrawString(variables.splittedOr[posJap], graphics, x, y);
+            variables.FontBlack.Painter.DrawString(variables.splittedOr[posJap], graphics, x + 1, y + 1, null, 4, 1);
+            variables.FontWhite.Painter.DrawString(variables.splittedOr[posJap], graphics, x, y, null, 4, 1);
+
             this.pictureBox1.Image = image;
             var image2 = new Bitmap(this.pictureBox2.Width, this.pictureBox2.Height);
             var graphics2 = Graphics.FromImage(image2);
-            variables.font.Painter.DrawString(variables.splittedMod[posEn], graphics2, x, y);
+            variables.FontBlack.Painter.DrawString(variables.splittedMod[posEn], graphics2, x + 1, y + 1, null, 4, 1);
+            variables.FontWhite.Painter.DrawString(variables.splittedMod[posEn], graphics2, x, y, null, 4, 1);
+
             this.pictureBox2.Image = image2;
         }
 
@@ -169,7 +180,7 @@ namespace MetalMaxViewer
             }
             else if (pos == 1)
             {
-                int textSize = variables.font.Painter.GetStringLength(richTextBox2.Text);
+                int textSize = variables.FontWhite.Painter.GetStringLength(richTextBox2.Text, 1);
                 colocarText(variables.textoOriginal[posText], richTextBox2.Text, pictureBox1.Width - textSize - 15, 110);
             }
             else if (pos == 2)
