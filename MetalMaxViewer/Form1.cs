@@ -176,7 +176,7 @@ namespace MetalMaxViewer
         {
             if (pos == 0)
             {
-                colocarText(variables.textoOriginal[posText], richTextBox2.Text, 12, 175);
+                colocarText(variables.textoOriginal[posText], richTextBox2.Text, 13, 175);
             }
             else if (pos == 1)
             {
