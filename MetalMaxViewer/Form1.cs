@@ -1,30 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.IO;
+using System.Reflection;
+using System.Windows.Forms;
+using Nftr;
+using Yarhl.FileFormat;
 using Yarhl.IO;
 using Yarhl.Media.Text;
-using Yarhl.FileFormat;
-using System.Drawing.Text;
 
 namespace MetalMaxViewer
 {
-
-
     public partial class Form1 : Form
     {
-        // Translated text
+        const string FontName = "LC12.NFTR";
+
         public Form1()
         {
             InitializeComponent();
-            File.WriteAllBytes("verdana2.ttf", Properties.Resources.PixelFJVerdana12pt);
-            
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -46,6 +38,22 @@ namespace MetalMaxViewer
             printText();
             variables.indice = listBox1.SelectedIndex;
         }
+
+        private bool LoadFont()
+        {
+            string exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string fontPath = Path.Combine(exePath, "Resources", FontName);
+            if (!File.Exists(fontPath))
+            {
+                MessageBox.Show($"Missing font: {fontPath}\nPlease put a font and try opening again the PO file.");
+                return false;
+            }
+
+            variables.font = new NftrFont(fontPath);
+
+            return true;
+        }
+
         private void printText()
         {
             richTextBox1.Text = variables.textoOriginal[listBox1.SelectedIndex];
@@ -53,6 +61,7 @@ namespace MetalMaxViewer
             label2.Text = variables.splittedOr.Length.ToString();
             label4.Text = variables.splittedMod.Length.ToString();
         }
+
         public void ImportPO(string poFileName)
         {
             DataStream inputPO = new DataStream(poFileName, FileOpenMode.Read);
@@ -92,40 +101,40 @@ namespace MetalMaxViewer
             public static string textoAuxiliar = "";
             public static int posAuxiliar = -1;
             public static int indice = -1;
-            public static Font font = new Font(@"verdana2.ttf", 15f, FontStyle.Regular, GraphicsUnit.Pixel);
+            public static NftrFont font;
         }
         public void cambioImagen(string contenido)
         {
             if (contenido.Contains(".MSG."))
             {
-                pictureBox1.BackgroundImage = MetalMaxViewer.Properties.Resources.bocadillo2;
+                pictureBox1.BackgroundImage = Properties.Resources.bocadillo2;
                 pictureBox1.BackgroundImageLayout=ImageLayout.Stretch;
-                pictureBox2.BackgroundImage = MetalMaxViewer.Properties.Resources.bocadillo2;
+                pictureBox2.BackgroundImage = Properties.Resources.bocadillo2;
                 pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
             }
             else if (contenido.Contains(".SET."))
             {
-                pictureBox1.BackgroundImage = MetalMaxViewer.Properties.Resources.objetos;
+                pictureBox1.BackgroundImage = Properties.Resources.objetos;
                 pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
-                pictureBox2.BackgroundImage = MetalMaxViewer.Properties.Resources.objetos;
+                pictureBox2.BackgroundImage = Properties.Resources.objetos;
                 pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
             }
         }
         
         public void colocarText(string texto1, string texto2, int x, int y)
         {
-            int posJap = Int32.Parse(label1.Text);
-            int posEn = Int32.Parse(label3.Text);
+            int posJap = int.Parse(label1.Text);
+            int posEn = int.Parse(label3.Text);
             posJap--;
             posEn--;
             splitText(texto1, texto2);
             var image = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
             var graphics = Graphics.FromImage(image);
-            graphics.DrawString(variables.splittedOr[posJap], variables.font, Brushes.White, new Point(x, y));
+            variables.font.Painter.DrawString(variables.splittedOr[posJap], graphics, x, y);
             this.pictureBox1.Image = image;
             var image2 = new Bitmap(this.pictureBox2.Width, this.pictureBox2.Height);
             var graphics2 = Graphics.FromImage(image2);
-            graphics2.DrawString(variables.splittedMod[posEn], variables.font, Brushes.White, new Point(x, y));
+            variables.font.Painter.DrawString(variables.splittedMod[posEn], graphics2, x, y);
             this.pictureBox2.Image = image2;
         }
 
@@ -160,8 +169,8 @@ namespace MetalMaxViewer
             }
             else if (pos == 1)
             {
-                Size textSize = TextRenderer.MeasureText(richTextBox2.Text, variables.font);
-                colocarText(variables.textoOriginal[posText], richTextBox2.Text, pictureBox1.Width - textSize.Width - 15, 110);
+                int textSize = variables.font.Painter.GetStringLength(richTextBox2.Text);
+                colocarText(variables.textoOriginal[posText], richTextBox2.Text, pictureBox1.Width - textSize - 15, 110);
             }
             else if (pos == 2)
             {
@@ -171,8 +180,8 @@ namespace MetalMaxViewer
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            int et1 = Int32.Parse(label1.Text);
-            int et3 = Int32.Parse(label3.Text);
+            int et1 = int.Parse(label1.Text);
+            int et3 = int.Parse(label3.Text);
             variables.textoTraducido[listBox1.SelectedIndex] = richTextBox2.Text;
             if (et1 > 1 && !(et1 < et3))
                 et1--;
@@ -185,8 +194,8 @@ namespace MetalMaxViewer
 
         private void button2_Click(object sender, EventArgs e)
         {
-            int et1 = Int32.Parse(label1.Text);
-            int et3 = Int32.Parse(label3.Text);
+            int et1 = int.Parse(label1.Text);
+            int et3 = int.Parse(label3.Text);
             variables.textoTraducido[listBox1.SelectedIndex] = richTextBox2.Text;
             if (et1 < variables.splittedOr.Length)
                 et1++;
@@ -196,34 +205,36 @@ namespace MetalMaxViewer
             label3.Text = et3.ToString();
             printText();
         }
-        void abrirArchivo()
+
+        void OpenPoFile()
         {
-            var fileContent = string.Empty;
-            var filePath = string.Empty;
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.InitialDirectory = "c:\\";
                 openFileDialog.Filter = "po files (*.po)|*.po|All files (*.*)|*.*";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                if (openFileDialog.ShowDialog() != DialogResult.OK)
                 {
-                    //Get the path of specified file
-                    filePath = openFileDialog.FileName;
-                    ImportPO(filePath);
-                    cambioImagen(filePath);
+                    return;
                 }
+
+                // Reload font just in case it changed.
+                if (!LoadFont())
+                {
+                    return;
+                }
+
+                string filePath = openFileDialog.FileName;
+                ImportPO(filePath);
+                cambioImagen(filePath);
             }
             
         }
+
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            abrirArchivo();
-        }
-        void guardarStrings (string antiguo)
-        {
-
+            OpenPoFile();
         }
 
         private void deshacerToolStripMenuItem_Click(object sender, EventArgs e)
