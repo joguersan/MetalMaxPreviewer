@@ -114,16 +114,18 @@ namespace MetalMaxViewer
         {
             if (contenido.Contains(".MSG."))
             {
-                pictureBox1.BackgroundImage = Properties.Resources.bocadillo2;
-                pictureBox1.BackgroundImageLayout=ImageLayout.Stretch;
-                pictureBox2.BackgroundImage = Properties.Resources.bocadillo2;
+                var image = Image.FromFile(Path.Combine("Resources", "bocadillo.jpg"));
+                pictureBox1.BackgroundImage = image;
+                pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
+                pictureBox2.BackgroundImage = image;
                 pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
             }
             else if (contenido.Contains(".SET."))
             {
-                pictureBox1.BackgroundImage = Properties.Resources.objetos;
+                var image = Image.FromFile(Path.Combine("Resources", "objetos.jpg"));
+                pictureBox1.BackgroundImage = image;
                 pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
-                pictureBox2.BackgroundImage = Properties.Resources.objetos;
+                pictureBox2.BackgroundImage = image;
                 pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
             }
         }
