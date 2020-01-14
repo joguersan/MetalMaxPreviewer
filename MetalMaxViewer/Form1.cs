@@ -77,6 +77,7 @@ namespace MetalMaxViewer
             inputPO.Dispose();
             int contador = 0;
             listBox1.Items.Clear();
+            variables.indice = 0;
             Array.Clear(variables.textoOriginal, 0, variables.textoOriginal.Length);
             Array.Clear(variables.textoTraducido, 0, variables.textoTraducido.Length);
             Array.Clear(variables.contexto, 0, variables.contexto.Length);
@@ -110,26 +111,27 @@ namespace MetalMaxViewer
 
             public static NftrFont FontBlack { get; set; }
         }
-        public void cambioImagen(string contenido)
+
+        public void UpdateBackground(string poFile)
         {
-            if (contenido.Contains(".MSG."))
+            if (poFile.Contains(".MSG."))
             {
                 var image = Image.FromFile(Path.Combine("Resources", "bocadillo.jpg"));
                 pictureBox1.BackgroundImage = image;
-                pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
+                pictureBox1.BackgroundImageLayout = ImageLayout.None;
                 pictureBox2.BackgroundImage = image;
-                pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
+                pictureBox2.BackgroundImageLayout = ImageLayout.None;
             }
-            else if (contenido.Contains(".SET."))
+            else if (poFile.Contains(".SET."))
             {
                 var image = Image.FromFile(Path.Combine("Resources", "objetos.jpg"));
                 pictureBox1.BackgroundImage = image;
-                pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
+                pictureBox1.BackgroundImageLayout = ImageLayout.None;
                 pictureBox2.BackgroundImage = image;
-                pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
+                pictureBox2.BackgroundImageLayout = ImageLayout.None;
             }
         }
-        
+
         public void colocarText(string texto1, string texto2, int x, int y)
         {
             int posJap = int.Parse(label1.Text);
@@ -178,7 +180,7 @@ namespace MetalMaxViewer
         {
             if (pos == 0)
             {
-                colocarText(variables.textoOriginal[posText], richTextBox2.Text, 13, 175);
+                colocarText(variables.textoOriginal[posText], richTextBox2.Text, 14, 145);
             }
             else if (pos == 1)
             {
@@ -240,9 +242,8 @@ namespace MetalMaxViewer
 
                 string filePath = openFileDialog.FileName;
                 ImportPO(filePath);
-                cambioImagen(filePath);
+                UpdateBackground(filePath);
             }
-            
         }
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
