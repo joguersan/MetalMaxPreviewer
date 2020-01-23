@@ -49,7 +49,11 @@ namespace MetalMaxViewer
                 return false;
             }
 
-            variables.font = new NftrFont(fontPath);
+            NftrFont.CustomPalette = new Colour[2] { Colour.FromColor(Color.White), new Colour(254, 254, 254) };
+            variables.FontWhite = new NftrFont(fontPath);
+
+            NftrFont.CustomPalette = new Colour[2] { Colour.FromColor(Color.White), new Colour(0, 0, 0) };
+            variables.FontBlack = new NftrFont(fontPath);
 
             return true;
         }
@@ -73,6 +77,7 @@ namespace MetalMaxViewer
             inputPO.Dispose();
             int contador = 0;
             listBox1.Items.Clear();
+            variables.indice = 0;
             Array.Clear(variables.textoOriginal, 0, variables.textoOriginal.Length);
             Array.Clear(variables.textoTraducido, 0, variables.textoTraducido.Length);
             Array.Clear(variables.contexto, 0, variables.contexto.Length);
@@ -101,26 +106,32 @@ namespace MetalMaxViewer
             public static string textoAuxiliar = "";
             public static int posAuxiliar = -1;
             public static int indice = -1;
-            public static NftrFont font;
+
+            public static NftrFont FontWhite { get; set; }
+
+            public static NftrFont FontBlack { get; set; }
         }
-        public void cambioImagen(string contenido)
+
+        public void UpdateBackground(string poFile)
         {
-            if (contenido.Contains(".MSG."))
+            if (poFile.Contains(".MSG."))
             {
-                pictureBox1.BackgroundImage = Properties.Resources.bocadillo2;
-                pictureBox1.BackgroundImageLayout=ImageLayout.Stretch;
-                pictureBox2.BackgroundImage = Properties.Resources.bocadillo2;
-                pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
+                var image = Image.FromFile(Path.Combine("Resources", "bocadillo.jpg"));
+                pictureBox1.BackgroundImage = image;
+                pictureBox1.BackgroundImageLayout = ImageLayout.None;
+                pictureBox2.BackgroundImage = image;
+                pictureBox2.BackgroundImageLayout = ImageLayout.None;
             }
-            else if (contenido.Contains(".SET."))
+            else if (poFile.Contains(".SET."))
             {
-                pictureBox1.BackgroundImage = Properties.Resources.objetos;
-                pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
-                pictureBox2.BackgroundImage = Properties.Resources.objetos;
-                pictureBox2.BackgroundImageLayout = ImageLayout.Stretch;
+                var image = Image.FromFile(Path.Combine("Resources", "objetos.jpg"));
+                pictureBox1.BackgroundImage = image;
+                pictureBox1.BackgroundImageLayout = ImageLayout.None;
+                pictureBox2.BackgroundImage = image;
+                pictureBox2.BackgroundImageLayout = ImageLayout.None;
             }
         }
-        
+
         public void colocarText(string texto1, string texto2, int x, int y)
         {
             int posJap = int.Parse(label1.Text);
@@ -130,11 +141,15 @@ namespace MetalMaxViewer
             splitText(texto1, texto2);
             var image = new Bitmap(this.pictureBox1.Width, this.pictureBox1.Height);
             var graphics = Graphics.FromImage(image);
-            variables.font.Painter.DrawString(variables.splittedOr[posJap], graphics, x, y);
+            variables.FontBlack.Painter.DrawString(variables.splittedOr[posJap], graphics, x + 1, y + 1, null, 4, 1);
+            variables.FontWhite.Painter.DrawString(variables.splittedOr[posJap], graphics, x, y, null, 4, 1);
+
             this.pictureBox1.Image = image;
             var image2 = new Bitmap(this.pictureBox2.Width, this.pictureBox2.Height);
             var graphics2 = Graphics.FromImage(image2);
-            variables.font.Painter.DrawString(variables.splittedMod[posEn], graphics2, x, y);
+            variables.FontBlack.Painter.DrawString(variables.splittedMod[posEn], graphics2, x + 1, y + 1, null, 4, 1);
+            variables.FontWhite.Painter.DrawString(variables.splittedMod[posEn], graphics2, x, y, null, 4, 1);
+
             this.pictureBox2.Image = image2;
         }
 
@@ -165,11 +180,11 @@ namespace MetalMaxViewer
         {
             if (pos == 0)
             {
-                colocarText(variables.textoOriginal[posText], richTextBox2.Text, 10, 175);
+                colocarText(variables.textoOriginal[posText], richTextBox2.Text, 12, 144);
             }
             else if (pos == 1)
             {
-                int textSize = variables.font.Painter.GetStringLength(richTextBox2.Text);
+                int textSize = variables.FontWhite.Painter.GetStringLength(richTextBox2.Text, 1);
                 colocarText(variables.textoOriginal[posText], richTextBox2.Text, pictureBox1.Width - textSize - 15, 110);
             }
             else if (pos == 2)
@@ -227,9 +242,8 @@ namespace MetalMaxViewer
 
                 string filePath = openFileDialog.FileName;
                 ImportPO(filePath);
-                cambioImagen(filePath);
+                UpdateBackground(filePath);
             }
-            
         }
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
